@@ -12,6 +12,7 @@ RUN set -ex \
         gstreamer1.0-plugins-bad \
         python3-crypto \
         python3-distutils \
+	sudo \
  && curl -L https://bootstrap.pypa.io/get-pip.py | python3 - \
  && pip install pipenv \
     # Clean-up
@@ -41,9 +42,14 @@ RUN set -ex \
 RUN set -ex \
  && mkdir -p /var/lib/mopidy/.config \
  && ln -s /config /var/lib/mopidy/.config/mopidy
-RUN python3 -m pip install Mopidy-Local
-RUN python3 -m pip install Mopidy-MPD
+RUN python3 -m pip install --upgrade Mopidy-Local
+RUN python3 -m pip install --upgrade Mopidy-MPD
+RUN python3 -m pip install --upgrade Mopidy-Slack
+RUN python3 -m pip install --upgrade Mopidy-Scrobbler
+RUN python3 -m pip install --upgrade Mopidy-Party
 RUN python3 -m pip install --upgrade Mopidy-Iris
+RUN python3 -m pip install --upgrade youtube-dl
+
 # Start helper script.
 COPY entrypoint.sh /entrypoint.sh
 
@@ -65,7 +71,7 @@ RUN set -ex \
 
 # Basic check,
 CMD ["chmod 777 /entrypoint.sh"]
-RUN /usr/bin/dumb-init /entrypoint.sh /usr/bin/mopidy --version
+RUN /usr/bin/dumb-init /entrypoint.sh /usr/local/bin/mopidy --version
 
 VOLUME ["/var/lib/mopidy/local", "/var/lib/mopidy/media"]
 CMD ["mkdir /var/lib/mopidy/playlists"]
@@ -74,7 +80,7 @@ CMD ["mkdir /var/lib/mopidy/playlists"]
 EXPOSE 6600 6680 5555/udp
 
 ENTRYPOINT ["/usr/bin/dumb-init", "/entrypoint.sh"]
-CMD ["/usr/bin/mopidy"]
+CMD ["/usr/local/bin/mopidy"]
 
 HEALTHCHECK --interval=5s --timeout=2s --retries=20 \
     CMD curl --connect-timeout 5 --silent --show-error --fail http://localhost:6680/ || exit 1
