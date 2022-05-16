@@ -54,7 +54,7 @@ RUN python3 -m pip install --upgrade youtube-dl
 COPY entrypoint.sh /entrypoint.sh
 
 # Default configuration.
-COPY mopidy.conf /config/mopidy.conf
+
 
 # Copy the pulse-client configuratrion.
 COPY pulse-client.conf /etc/pulse/client.conf
